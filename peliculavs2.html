@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            overflow-x: hidden;
+            background: linear-gradient(180deg , rgb(20, 20, 20) 0% , rgb(7, 7, 7) 100% );
+            background-size: 100%;
+      
+        }
+        .padre{
+            width: 100vw;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+        }
+        .padre input{
+            width: 250px;
+            height: 20px;
+            border-radius: 10px;
+            outline: 0;
+            border: 1px solid rgb(102, 101, 101);
+        }
+        .padre h1{
+            color: aliceblue;
+        }
+        ol{
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr;
+            gap: 5px;
+            list-style-type: none;
+            width: 100%;
+        
+        }
+        .li img{
+            width: 300px;
+            height: 350px;
+            border-radius: 10px;
+        }
+        .li h3,p{
+            color: aliceblue;
+        }
+        #botom{
+            width: 100px;
+            height: 40px;
+            border-radius: 10px;
+            border: 1px solid rgb(94, 92, 92);
+            font-size: 1.1em;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: black;
+            color: aliceblue;
+            transition: all .2s linear;
+        }
+        #botom:hover{
+            transform: scale(1.1);
+        }
+        #botom:active{
+            transform: skew(-15deg);
+        }
+        @media (max-width:430px){
+            ol{
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="padre">
+            <h1>buscador de peliculas</h1>
+            <input type="text" name="movie" id="movie">
+            <button id="botom">buscar</button>
+            <ol id="lista"></ol>
+        </div>
+    </header>
+    <script>
+        let api_key = "2924984e7effaef9712ac54e5747b5bd"
+        let entrada = document.getElementById("movie")
+        let urlimg = "https://image.tmdb.org/t/p/w500"
+        entrada.addEventListener("input" , validarinput)
+
+        function validarinput(){
+
+            if(entrada.value.length > 2){
+                buscarapi(entrada)
+            }else{
+                eliminar()
+            }
+        }
+
+        async function buscarapi(entrada) {
+            try {
+                let api = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${api_key}&query=${entrada.value}`)
+                let api_lista = await api.json()
+                console.log(api_lista)
+                api_echa(api_lista.results)
+            } catch (error) {
+                console.log("algo anda mal")
+            }
+        }
+
+        function api_echa(movie){
+            movie.forEach(movie => {
+                let lista = document.getElementById("lista")
+                let li = document.createElement("li")
+                let img1 = urlimg + movie.poster_path
+                li.classList.add("li")
+                li.innerHTML = `
+                <img src="${img1}">
+                <h3>${movie.original_title}</h3>
+                <p>lanzamiento ${movie.release_date}</p>
+                `
+                lista.appendChild(li)
+            });
+        }
+
+        function eliminar(){
+            let lista = document.getElementById("lista")
+            lista.innerHTML = ""
+        }
+    </script>
+</body>
+</html>
