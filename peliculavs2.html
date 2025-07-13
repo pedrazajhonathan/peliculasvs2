@@ -16,7 +16,7 @@
             position: relative;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 80px;
             align-items: center;
             justify-content: center;
         }
@@ -30,21 +30,27 @@
         .padre h1{
             color: aliceblue;
         }
-        ol{
+        #lista{
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             grid-template-rows: 1fr 1fr 1fr;
-            gap: 5px;
-            list-style-type: none;
+            gap: 10px;
             width: 100%;
-        
+            row-gap: 140px;
         }
-        .li img{
-            width: 300px;
-            height: 350px;
+        .div{
+            width: 250px;
+            height: 300px;
+            position: relative;
+         
+            
+        }
+        .div img{
+            width: 250px;
+            height: 300px;
             border-radius: 10px;
         }
-        .li h3,p{
+        .div h3,p{
             color: aliceblue;
         }
         #botom{
@@ -57,6 +63,8 @@
             background-color: black;
             color: aliceblue;
             transition: all .2s linear;
+            position: relative;
+            bottom: 60px;
         }
         #botom:hover{
             transform: scale(1.1);
@@ -64,12 +72,49 @@
         #botom:active{
             transform: skew(-15deg);
         }
+        #parrafo{
+            font-size: 2em;
+            color: aliceblue;
+            text-align: center;
+            position: relative;
+            bottom: 450px;
+        }
+        .circulo{
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 3px solid black;
+            border-bottom:  3px solid blue;
+            animation: rotar 1s linear infinite;
+            display: none;
+            position: relative;
+            bottom: 450px;
+        }
         @media (max-width:430px){
-            ol{
+            #lista{
                 grid-template-columns: 1fr;
                 grid-template-rows: 1fr;
             }
+            #parrafo{
+                bottom: 200px;
+            }
+            .circulo{
+                bottom: 180px;
+            }
         }
+        @keyframes rotar{
+            from{
+                transform: rotate(0deg);
+            }
+            to{
+                transform: rotate(360deg);
+            }
+
+        }
+        .holamundo{
+            display: block;
+        }
+
     </style>
 </head>
 <body>
@@ -77,30 +122,48 @@
         <div class="padre">
             <h1>buscador de peliculas</h1>
             <input type="text" name="movie" id="movie">
-
-            <ol id="lista"></ol>
+            <button id="botom">buscar</button>
+            <div id="lista"></div>
+            <div id="cir" class="circulo"></div>
+            <p id="parrafo"></p>
         </div>
     </header>
     <script>
         let api_key = "2924984e7effaef9712ac54e5747b5bd"
         let entrada = document.getElementById("movie")
         let urlimg = "https://image.tmdb.org/t/p/w500"
-        entrada.addEventListener("input" , validarinput)
+        let botom = document.getElementById("botom")
+        botom.addEventListener("click" , validarinput)
+        let mensaje = document.getElementById("parrafo")
+        let circulo = document.getElementById("cir")
 
         function validarinput(){
 
-            if(entrada.value.length > 2){
-                buscarapi(entrada)
+            if(entrada.value){
+                cargando()
+                mensaje.textContent = ""
+                setTimeout(() => {
+                    buscarapi(entrada)
+                    circulo.classList.remove("holamundo")
+                }, 1000);
             }else{
-                eliminar()
+                cargando()
+                mensaje.textContent = ""
+                setTimeout(() => {
+                    error()
+                    circulo.classList.remove("holamundo")
+                }, 1000);
             }
+            
         }
-
+        function cargando(){
+            circulo.classList.add("holamundo")
+        }
         async function buscarapi(entrada) {
             try {
                 let api = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${api_key}&query=${entrada.value}`)
                 let api_lista = await api.json()
-                console.log(api_lista)
+  
                 api_echa(api_lista.results)
             } catch (error) {
                 console.log("algo anda mal")
@@ -108,24 +171,30 @@
         }
 
         function api_echa(movie){
+            
+            let lista = document.getElementById("lista")
+            lista.innerHTML = ""
             movie.forEach(movie => {
-                let lista = document.getElementById("lista")
-                let li = document.createElement("li")
+                let div = document.createElement("div")
                 let img1 = urlimg + movie.poster_path
-                li.classList.add("li")
-                li.innerHTML = `
+                div.classList.add("div")
+                div.innerHTML = `
                 <img src="${img1}">
                 <h3>${movie.original_title}</h3>
                 <p>lanzamiento ${movie.release_date}</p>
                 `
-                lista.appendChild(li)
+                lista.appendChild(div)
+     
             });
         }
 
-        function eliminar(){
+        function error(){
+            mensaje.textContent = "no se encontro ningun resultado"
             let lista = document.getElementById("lista")
             lista.innerHTML = ""
         }
+
+       
     </script>
 </body>
 </html>
